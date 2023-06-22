@@ -21,6 +21,7 @@ export default {
     data() {
         return {
             userPp: '/user.png',
+            topTracksWithCovers: [],
         }
     }
 }
@@ -47,7 +48,11 @@ export default {
           <img src="/top.svg" alt=""/><h4>Musiques Favorites</h4>
         </div>
         <ul>
-          <li v-for="track in topTracks" :key="track">{{ track }}</li>
+          <li v-for="track in topTracks" :key="track.name">
+            <img :src="track.coverUrl" alt="" class="trackCover" />
+            <span>{{ track.name }}</span>
+          </li>
+
         </ul>
     </div>
   </div>
@@ -95,5 +100,9 @@ export default {
 }
 h2{
     margin-left: 2.4em;
+}
+.trackCover {
+  width: 1.5em;
+  margin-right: 0.5em;
 }
 </style>
