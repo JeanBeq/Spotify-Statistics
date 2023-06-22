@@ -109,16 +109,16 @@ export default {
         },
 
         async fetchProfil() {
-            
             const token = localStorage.acces_token;
 
             const result = await fetch("https://api.spotify.com/v1/me", {
-                method: "GET", 
-                headers: { Authorization: `Bearer ${token}` }
+                method: "GET",
+                headers: { Authorization: `Bearer ${token}` },
             });
 
             return result.json();
         },
+
         fetchProfilTop() {
             try {
                 const token = localStorage.acces_token;
@@ -146,47 +146,64 @@ export default {
                 const token = localStorage.acces_token;
 
                 return fetch("https://api.spotify.com/v1/me/top/tracks?limit=5", {
-                    method: "GET",
-                    headers: { Authorization: `Bearer ${token}` },
+                method: "GET",
+                headers: { Authorization: `Bearer ${token}` },
                 })
                 .then(response => response.json())
                 .then(data => {
-                    const topTracks = data.items.map(item => item.name);
+                const topTracks = data.items.map(item => {
+                    return {
+                    name: item.name,
+                    coverUrl: item.album.images.length > 0 ? item.album.images[0].url : ''
+                    };
+                });
                     return topTracks;
                 })
                 .catch(error => {
                     console.error("Failed to fetch top tracks:", error);
                     return [];
                 });
-            } catch (error) {
-                console.error("Failed to fetch top tracks:", error);
-                return [];
-            }
+                } catch (error) {
+                    console.error("Failed to fetch top tracks:", error);
+                    return [];
+                }
         },
 
         displayProfil() {
             Promise.all([this.fetchProfil(), this.fetchProfilTop(), this.fetchProfilTopMusics()])
-                .then(([profil, topArtists, topTracks]) => {
+                .then(([profil, topArtists, topTracksWithCovers]) => {
+                if (profil) {
                     this.profil = profil;
-                    console.log(this.profil);
                     this.profilTop = topArtists;
-                    console.log(this.profilTop);
-                    this.topTracks = topTracks;
-                    console.log(this.topTracks);
+                    this.topTracks = topTracksWithCovers;
                     this.populateUI();
+                } else {
+                    console.error("Failed to fetch profile data.");
+                }
                 })
                 .catch(error => {
                     console.error("Failed to display profile:", error);
-                });
+            });
         },
+
+
 
         populateUI() {
             if (this.profil) {
-                document.getElementById("displayName").innerText = this.profil.display_name;
-                document.getElementById("imgUrl").src = this.profil.images[0].url;
-                console.log('image: ',this.profil.images[0].url)
+                const displayNameElement = document.getElementById("displayName");
+                const imgUrlElement = document.getElementById("imgUrl");
+
+                if (displayNameElement) {
+                displayNameElement.innerText = this.profil.display_name;
+                }
+
+                if (imgUrlElement && this.profil.images.length > 0) {
+                imgUrlElement.src = this.profil.images[0].url;
+                console.log('image: ', this.profil.images[0].url);
+                }
             }
         },
+
 
         isTokenExpired() {
             const expire_in_timestamp = localStorage.isTokenExpired
