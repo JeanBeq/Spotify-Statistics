@@ -57,7 +57,6 @@ export default {
 
             document.location = `https://accounts.spotify.com/authorize?${params.toString()}`;
         },
-
         generateCodeVerifier(length) {
             let text = '';
             let possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
@@ -67,7 +66,6 @@ export default {
             }
             return text;
         },
-
         async generateCodeChallenge(codeVerifier) {
             const encoder = new TextEncoder();
             const data = encoder.encode(codeVerifier);
@@ -80,7 +78,6 @@ export default {
                 .replace(/=+$/, "");
             return base64UrlDigest;
         },
-
         async getAccessToken(clientId, code) {
             const verifier = localStorage.getItem("verifier");
 
@@ -107,7 +104,6 @@ export default {
 
             return access_token;
         },
-
         async fetchProfil() {
             const token = localStorage.acces_token;
 
@@ -118,23 +114,27 @@ export default {
 
             return result.json();
         },
-
         fetchProfilTop() {
             try {
                 const token = localStorage.acces_token;
 
                 return fetch("https://api.spotify.com/v1/me/top/artists?limit=5", {
-                    method: "GET",
-                    headers: { Authorization: `Bearer ${token}` },
+                method: "GET",
+                headers: { Authorization: `Bearer ${token}` },
                 })
                 .then(response => response.json())
                 .then(data => {
-                    const topArtists = data.items.map(item => item.name);
-                    return topArtists;
+                const topArtists = data.items.map(item => {
+                    return {
+                    name: item.name,
+                    imageUrl: item.images.length > 0 ? item.images[0].url : ''
+                    };
+                });
+                return topArtists;
                 })
                 .catch(error => {
-                    console.error("Failed to fetch top artists:", error);
-                    return [];
+                console.error("Failed to fetch top artists:", error);
+                return [];
                 });
             } catch (error) {
                 console.error("Failed to fetch top artists:", error);
@@ -168,7 +168,6 @@ export default {
                     return [];
                 }
         },
-
         displayProfil() {
             Promise.all([this.fetchProfil(), this.fetchProfilTop(), this.fetchProfilTopMusics()])
                 .then(([profil, topArtists, topTracksWithCovers]) => {
@@ -185,9 +184,6 @@ export default {
                     console.error("Failed to display profile:", error);
             });
         },
-
-
-
         populateUI() {
             if (this.profil) {
                 const displayNameElement = document.getElementById("displayName");
@@ -203,14 +199,11 @@ export default {
                 }
             }
         },
-
-
         isTokenExpired() {
             const expire_in_timestamp = localStorage.isTokenExpired
             const now_timestamp = Date.now();
             return expire_in_timestamp <= now_timestamp;
         },
-
         logOut(){
             localStorage.removeItem("acces_token");
             localStorage.removeItem("isTokenExpired");

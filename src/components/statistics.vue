@@ -16,12 +16,13 @@ export default {
       profilDisplayName: {
         type: String,
       default: '',
-      }
+      },
     },
     data() {
         return {
             userPp: '/user.png',
             topTracksWithCovers: [],
+            topArtistsWithImages: [],
         }
     }
 }
@@ -40,7 +41,10 @@ export default {
           <img src="/top.svg" alt=""/><h4>Artistes Favoris</h4>
         </div>
         <ul>
-          <li v-for="artist in profilTop" :key="artist">{{ artist }}</li>
+          <li v-for="artist in profilTop" :key="artist.name">
+            <img :src="artist.imageUrl" alt="" class="artistImage" />
+            <span>{{ artist.name }}</span>
+          </li>
         </ul>
     </div>
     <div class="favSongs favDiv">
@@ -104,5 +108,11 @@ h2{
 .trackCover {
   width: 1.5em;
   margin-right: 0.5em;
+}
+.artistImage {
+  width: 2em;
+  height: 2em;
+  margin-right: 0.5em;
+  border-radius: 50%;
 }
 </style>
