@@ -21,6 +21,9 @@ export default {
     data() {
         return {
             userPp: '/user.png',
+            topTracksWithCovers: [],
+            topArtistsWithImages: [],
+            topTracksWithCovers: [],topTracksWithCovers: [],
         }
     }
 }
@@ -95,5 +98,15 @@ export default {
 }
 h2{
     margin-left: 2.4em;
+}
+.trackCover {
+  width: 1.5em;
+  margin-right: 0.5em;
+}
+.artistImage {
+  width: 2em;
+  height: 2em;
+  margin-right: 0.5em;
+  border-radius: 50%;
 }
 </style>
