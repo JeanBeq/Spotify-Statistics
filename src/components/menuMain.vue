@@ -14,6 +14,7 @@ export default {
             profil : null,
             profilTop : [],
             topTracks : [],
+            topArtists : [],
         }
     },
     mounted(){
@@ -124,13 +125,18 @@ export default {
                 const token = localStorage.acces_token;
 
                 return fetch("https://api.spotify.com/v1/me/top/artists?limit=5", {
-                    method: "GET",
-                    headers: { Authorization: `Bearer ${token}` },
+                method: "GET",
+                headers: { Authorization: `Bearer ${token}` },
                 })
                 .then(response => response.json())
                 .then(data => {
-                    const topArtists = data.items.map(item => item.name);
-                    return topArtists;
+                const topArtists = data.items.map(item => {
+                    return {
+                        name: item.name,
+                        imageUrl: item.images.length > 0 ? item.images[0].url : ''
+                    };
+                });
+                return topArtists;
                 })
                 .catch(error => {
                     console.error("Failed to fetch top artists:", error);
@@ -146,13 +152,18 @@ export default {
                 const token = localStorage.acces_token;
 
                 return fetch("https://api.spotify.com/v1/me/top/tracks?limit=5", {
-                    method: "GET",
-                    headers: { Authorization: `Bearer ${token}` },
+                method: "GET",
+                headers: { Authorization: `Bearer ${token}` },
                 })
                 .then(response => response.json())
                 .then(data => {
-                    const topTracks = data.items.map(item => item.name);
-                    return topTracks;
+                const topTracks = data.items.map(item => {
+                    return {
+                    name: item.name,
+                    coverUrl: item.album.images.length > 0 ? item.album.images[0].url : ''
+                    };
+                });
+                return topTracks;
                 })
                 .catch(error => {
                     console.error("Failed to fetch top tracks:", error);
@@ -164,16 +175,44 @@ export default {
             }
         },
 
+        // fetchProfilLastMusics() {
+        //     try {
+        //         const token = localStorage.acces_token;
+
+        //         return fetch("https://api.spotify.com/v1/me/player/recently-played", {
+        //         method: "GET",
+        //         headers: { Authorization: `Bearer ${token}` },
+        //         })
+        //         .then(response => response.json())
+        //         .then(data => {
+        //         const lastPlayed = data.items.map(item => {
+        //             return {
+        //             };
+        //         });
+        //         return lastPlayed;
+        //         })
+        //         .catch(error => {
+        //             console.error("Failed to fetch last played:", error);
+        //             return [];
+        //         });
+        //     } catch (error) {
+        //         console.error("Failed to fetch last played:", error);
+        //         return [];
+        //     }
+        // },
+
         displayProfil() {
             Promise.all([this.fetchProfil(), this.fetchProfilTop(), this.fetchProfilTopMusics()])
-                .then(([profil, topArtists, topTracks]) => {
-                    this.profil = profil;
-                    console.log(this.profil);
-                    this.profilTop = topArtists;
-                    console.log(this.profilTop);
-                    this.topTracks = topTracks;
-                    console.log(this.topTracks);
-                    this.populateUI();
+                .then(([profil, topArtists, topTracksWithCovers]) => {
+                    if (profil) {
+                        this.profil = profil;
+                        this.profilTop = topArtists;
+                        this.topTracks = topTracksWithCovers;
+                        this.topArtists = topArtists; // Assurez-vous d'ajouter cette ligne pour définir la propriété topArtists
+                        this.populateUI();
+                    } else {
+                        console.error("Failed to fetch profile data.");
+                    }
                 })
                 .catch(error => {
                     console.error("Failed to display profile:", error);
@@ -208,8 +247,8 @@ export default {
         <div class="mainNav">
             <nav>
                 <div class="navTop">
-                    <button id="buttonConexion" @click="redirectToAuthCodeFlow(clientId)"><img src="/stats.svg" alt=""/>Connexion</button>
-                    <button id="buttonLogOut" @click="logOut"><img src="/cross.svg" alt=""/>Déconnection</button>
+                    <button v-if="this.code == null && (this.accessToken == null || this.accessToken == undefined)" id="buttonConexion" @click="redirectToAuthCodeFlow(clientId)"><img src="/stats.svg" alt=""/>Connexion</button>
+                    <button v-if="this.accessToken != null" id="buttonLogOut" @click="logOut"><img src="/cross.svg" alt=""/>Déconnection</button>
                 </div>
             </nav>
         <div class="navBottom">
@@ -219,7 +258,7 @@ export default {
     </div>
 </div>
 <router-view />
-<statistics v-if="profilTop.length > 0" :profilTop="profilTop" :topTracks="topTracks" :profilPhoto="profil.images[0].url" :profilDisplayName="profil.display_name" />
+<statistics v-if="profilTop.length > 0" :profilTop="profilTop" :topArtists="topArtists" :topTracks="topTracks" :profilPhoto="profil.images[0].url" :profilDisplayName="profil.display_name" />
 
 
 </template>

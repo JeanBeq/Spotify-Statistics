@@ -15,15 +15,18 @@ export default {
       },
       profilDisplayName: {
         type: String,
-      default: '',
-      }
+        default: '',
+      },
+      topArtists: {
+        type: Array,
+        default: () => [],
+      },
     },
     data() {
         return {
             userPp: '/user.png',
             topTracksWithCovers: [],
             topArtistsWithImages: [],
-            topTracksWithCovers: [],topTracksWithCovers: [],
         }
     }
 }
@@ -42,7 +45,10 @@ export default {
           <img src="/top.svg" alt=""/><h4>Artistes Favoris</h4>
         </div>
         <ul>
-          <li v-for="artist in profilTop" :key="artist">{{ artist }}</li>
+          <li v-for="artist in topArtists" :key="artist.name">
+            <img :src="artist.imageUrl" alt="" class="artistImage" />
+            <span>{{ artist.name }}</span>
+          </li>
         </ul>
     </div>
     <div class="favSongs favDiv">
@@ -50,7 +56,10 @@ export default {
           <img src="/top.svg" alt=""/><h4>Musiques Favorites</h4>
         </div>
         <ul>
-          <li v-for="track in topTracks" :key="track">{{ track }}</li>
+          <li v-for="track in topTracks" :key="track.name">
+            <img :src="track.coverUrl" alt="" class="trackCover" />
+            <span>{{ track.name }}</span>
+          </li>
         </ul>
     </div>
   </div>

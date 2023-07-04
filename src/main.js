@@ -5,6 +5,8 @@ import Home from './pages/home.vue'
 import Callback from './pages/callback.vue'
 import './style.css'
 import { createRouter, createWebHistory } from 'vue-router'
+import AOS from 'aos'
+import 'aos/dist/aos.css'
 const router = VueRouter.createRouter({
     history: VueRouter.createWebHistory(),
     routes: [
